@@ -1,0 +1,9 @@
+displayName: Template Headers
+summary: Allows customizing headers by using Go Templating with the Golang request object that traefik uses
+type: middleware
+import: github.com/colearendt/traefik-plugin-template-headers
+compatibility: TODO
+testData:
+  templateHeaders:
+    - header: X-Exact-Request
+      template: '{{ .Scheme }}://{{ .Host }}{{ .RequestURI }}'
