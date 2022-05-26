@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
 	"text/template"
 )
 
@@ -34,8 +37,14 @@ type templateHeaders struct {
 	templateHeaders []internalTemplateHeader
 }
 
+var (
+	loggerINFO = log.New(ioutil.Discard, "INFO: TemplateHeaders: ", log.Ldate|log.Ltime|log.Lshortfile)
+)
+
 func New(_ context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
-	fmt.Printf("Starting with config: %v\n", config.TemplateHeaders)
+	loggerINFO.SetOutput(os.Stdout)
+
+	loggerINFO.Printf("Starting with config: %v\n", config.TemplateHeaders)
 	templates := make([]internalTemplateHeader, len(config.TemplateHeaders))
 
 	for i, tmpl := range config.TemplateHeaders {
