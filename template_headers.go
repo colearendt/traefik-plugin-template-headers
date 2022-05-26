@@ -35,6 +35,7 @@ type templateHeaders struct {
 }
 
 func New(_ context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
+	fmt.Printf("Starting with config: %v\n", config.TemplateHeaders)
 	templates := make([]internalTemplateHeader, len(config.TemplateHeaders))
 
 	for i, tmpl := range config.TemplateHeaders {
