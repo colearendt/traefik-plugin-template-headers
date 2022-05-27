@@ -53,7 +53,7 @@ func New(_ context.Context, next http.Handler, config *Config, name string) (htt
 		loggerDEBUG.SetOutput(os.Stdout)
 	}
 
-	loggerINFO.Printf("Starting with config: %v\n", config.TemplateHeaders)
+	loggerINFO.Printf("Starting with config: %v\n", config)
 	templates := make([]internalTemplateHeader, len(config.TemplateHeaders))
 
 	for i, tmpl := range config.TemplateHeaders {
