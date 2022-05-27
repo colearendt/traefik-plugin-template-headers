@@ -48,9 +48,11 @@ func New(_ context.Context, next http.Handler, config *Config, name string) (htt
 	switch config.LogLevel {
 	case "INFO":
 		loggerINFO.SetOutput(os.Stdout)
+		loggerINFO.Print("Enabling INFO logging")
 	case "DEBUG":
 		loggerINFO.SetOutput(os.Stdout)
 		loggerDEBUG.SetOutput(os.Stdout)
+		loggerINFO.Print("Enabling DEBUG logging")
 	}
 
 	loggerINFO.Printf("Starting with config: %v\n", config)
@@ -100,6 +102,8 @@ func (r *templateHeaders) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		HttpXForwardedHost:  req.Header.Get("X-Forwarded-Host"),
 		HttpHost:            req.Header.Get("Host"),
 	}
+
+	loggerINFO.Printf("Serving HTTP request: %v", req)
 
 	// debug print data
 	loggerDEBUG.Printf("Path: %v\n", tmplData.Path)
