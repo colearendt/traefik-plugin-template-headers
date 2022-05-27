@@ -24,9 +24,11 @@ type internalTemplateHeader struct {
 
 // Config holds the plugin configuration
 type Config struct {
-	TemplateHeaders []TemplateHeader `json:"template-headers,omitempty"`
+	TemplateHeaders []TemplateHeader `json:"template-headers,omitempty" yaml:"templateHeaders"`
+	LogLevel        string           `json:"log-level" yaml:"logLevel"`
 }
 
+// CreateConfig populates the config data object
 func CreateConfig() *Config {
 	return &Config{}
 }
@@ -38,11 +40,18 @@ type templateHeaders struct {
 }
 
 var (
-	loggerINFO = log.New(ioutil.Discard, "INFO: TemplateHeaders: ", log.Ldate|log.Ltime|log.Lshortfile)
+	loggerINFO  = log.New(ioutil.Discard, "INFO: TemplateHeaders: ", log.Ldate|log.Ltime|log.Lshortfile)
+	loggerDEBUG = log.New(ioutil.Discard, "DEBUG: TemplateHeaders: ", log.Ldate|log.Ltime|log.Lshortfile)
 )
 
 func New(_ context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
-	loggerINFO.SetOutput(os.Stdout)
+	switch config.LogLevel {
+	case "INFO":
+		loggerINFO.SetOutput(os.Stdout)
+	case "DEBUG":
+		loggerINFO.SetOutput(os.Stdout)
+		loggerDEBUG.SetOutput(os.Stdout)
+	}
 
 	loggerINFO.Printf("Starting with config: %v\n", config.TemplateHeaders)
 	templates := make([]internalTemplateHeader, len(config.TemplateHeaders))
@@ -91,6 +100,19 @@ func (r *templateHeaders) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		HttpXForwardedHost:  req.Header.Get("X-Forwarded-Host"),
 		HttpHost:            req.Header.Get("Host"),
 	}
+
+	// debug print data
+	loggerDEBUG.Printf("Path: %v\n", tmplData.Path)
+	loggerDEBUG.Printf("Scheme: %v\n", tmplData.Scheme)
+	loggerDEBUG.Printf("Host: %v\n", tmplData.Host)
+	loggerDEBUG.Printf("Method: %v\n", tmplData.Method)
+	loggerDEBUG.Printf("Proto: %v\n", tmplData.Proto)
+	loggerDEBUG.Printf("Query: %v\n", tmplData.Query)
+	loggerDEBUG.Printf("RequestURI: %v\n", tmplData.RequestURI)
+	loggerDEBUG.Printf("HttpXForwardedProto: %v\n", tmplData.HttpXForwardedProto)
+	loggerDEBUG.Printf("HttpXForwardedHost: %v\n", tmplData.HttpXForwardedHost)
+	loggerDEBUG.Printf("HttpHost: %v\n", tmplData.HttpHost)
+
 	for i, tmpl := range r.templateHeaders {
 		if len(tmpl.Header) > 0 {
 			// TODO: check for whether header already exists?
